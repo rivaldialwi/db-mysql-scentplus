@@ -59,7 +59,8 @@ def save_to_database(input_text, result):
             host='localhost',       # Ganti dengan host MySQL Anda
             user='root',            # Ganti dengan username MySQL Anda
             password='password',    # Ganti dengan password MySQL Anda
-            database='scentplus'    # Nama database
+            database='scentplus',   # Nama database
+            port=3306               # Pastikan port sudah benar
         )
         cursor = connection.cursor()
         
