@@ -7,6 +7,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split  # Tambahkan import untuk train_test_split
+import mysql.connector
+from datetime import datetime
 
 # Lakukan unduhan NLTK di awal skrip
 nltk.download('stopwords')
@@ -51,6 +53,34 @@ def classify_text(input_text):
     # Melakukan prediksi menggunakan model
     predicted_label = logreg_model.predict(input_vector)[0]
     return predicted_label
+
+# Fungsi untuk menyimpan hasil analisis ke dalam database
+def save_to_database(input_text, result):
+    # Konfigurasi koneksi ke database
+    connection = mysql.connector.connect(
+        host='localhost',       # Ganti dengan host MySQL Anda
+        user='root',            # Ganti dengan username MySQL Anda
+        password='password',    # Ganti dengan password MySQL Anda
+        database='scentplus'    # Nama database
+    )
+    cursor = connection.cursor()
+    
+    # Mendapatkan waktu saat ini
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Membuat query untuk menyimpan data
+    query = "INSERT INTO riwayat (text, hasil, date) VALUES (%s, %s, %s)"
+    values = (input_text, result, current_time)
+    
+    # Menjalankan query
+    cursor.execute(query, values)
+    
+    # Commit perubahan
+    connection.commit()
+    
+    # Menutup koneksi
+    cursor.close()
+    connection.close()
 
 # Streamlit UI
 st.title("Aplikasi Analisis Sentimen Scentplus")
