@@ -70,7 +70,7 @@ def save_to_database(input_text, result):
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         # Membuat query untuk menyimpan data
-        query = "INSERT INTO riwayat (text, hasil, date) VALUES (%s, %s, %s)"
+        query = "INSERT INTO riwayat (id, text, hasil, date) VALUES (%s, %s, %s)"
         values = (input_text, result, current_time)
         
         # Menjalankan query
