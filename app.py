@@ -56,31 +56,37 @@ def classify_text(input_text):
 
 # Fungsi untuk menyimpan hasil analisis ke dalam database
 def save_to_database(input_text, result):
-    # Konfigurasi koneksi ke database
-    connection = mysql.connector.connect(
-        host='localhost',       # Ganti dengan host MySQL Anda
-        user='root',            # Ganti dengan username MySQL Anda
-        password='password',    # Ganti dengan password MySQL Anda
-        database='scentplus'    # Nama database
-    )
-    cursor = connection.cursor()
-    
-    # Mendapatkan waktu saat ini
-    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
-    # Membuat query untuk menyimpan data
-    query = "INSERT INTO riwayat (text, hasil, date) VALUES (%s, %s, %s)"
-    values = (input_text, result, current_time)
-    
-    # Menjalankan query
-    cursor.execute(query, values)
-    
-    # Commit perubahan
-    connection.commit()
-    
-    # Menutup koneksi
-    cursor.close()
-    connection.close()
+    try:
+        # Konfigurasi koneksi ke database
+        connection = mysql.connector.connect(
+            host='localhost',       # Ganti dengan host MySQL Anda
+            user='root',            # Ganti dengan username MySQL Anda
+            password='password',    # Ganti dengan password MySQL Anda
+            database='scentplus'    # Nama database
+        )
+        cursor = connection.cursor()
+        
+        # Mendapatkan waktu saat ini
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Membuat query untuk menyimpan data
+        query = "INSERT INTO riwayat (text, hasil, date) VALUES (%s, %s, %s)"
+        values = (input_text, result, current_time)
+        
+        # Menjalankan query
+        cursor.execute(query, values)
+        
+        # Commit perubahan
+        connection.commit()
+        
+        # Menutup koneksi
+        cursor.close()
+        connection.close()
+        
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Error: {err}")
+        return False
 
 # Streamlit UI
 st.title("Aplikasi Analisis Sentimen Scentplus")
