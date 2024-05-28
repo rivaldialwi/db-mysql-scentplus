@@ -55,10 +55,10 @@ def classify_text(input_text):
 def save_to_database(input_text, result):
     try:
         # Membaca informasi koneksi dari secrets.toml
-        db_connection_url = st.secrets["connections"]["mysql"]
+        db_secrets = st.secrets["mysql"]
         
         # Membuat engine SQLAlchemy
-        engine = create_engine(f"{db_connection_url['dialect']}://{db_connection_url['username']}:{db_connection_url['password']}@{db_connection_url['host']}:{db_connection_url['port']}/{db_connection_url['database']}?charset={db_connection_url['query']['charset']}")
+        engine = create_engine(f"{db_secrets['dialect']}://{db_secrets['username']}:{db_secrets['password']}@{db_secrets['host']}:{db_secrets['port']}/{db_secrets['database']}?charset={db_secrets['query']['charset']}")
         
         # Mendapatkan waktu saat ini
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
