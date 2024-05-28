@@ -8,8 +8,7 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from datetime import datetime
-import sqlalchemy
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, text
 
 # Lakukan unduhan NLTK di awal skrip
 nltk.download('stopwords')
@@ -55,27 +54,22 @@ def classify_text(input_text):
 # Fungsi untuk menyimpan hasil analisis ke dalam database
 def save_to_database(input_text, result):
     try:
-        # Inisialisasi koneksi menggunakan st.connection
-        conn = st.connection('mysql', type='sql')
+        # Membaca informasi koneksi dari secrets.toml
+        db_connection_url = st.secrets["connections"]["mysql"]
         
-        # Membuat sesi SQLAlchemy
-        engine = conn.get_engine()
-        Session = sessionmaker(bind=engine)
-        session = Session()
+        # Membuat engine SQLAlchemy
+        engine = create_engine(f"{db_connection_url['dialect']}://{db_connection_url['username']}:{db_connection_url['password']}@{db_connection_url['host']}:{db_connection_url['port']}/{db_connection_url['database']}?charset={db_connection_url['query']['charset']}")
         
         # Mendapatkan waktu saat ini
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         # Membuat query untuk menyimpan data
-        query = sqlalchemy.text("INSERT INTO riwayat (text, hasil, date) VALUES (:text, :hasil, :date)")
+        query = text("INSERT INTO riwayat (text, hasil, date) VALUES (:text, :hasil, :date)")
         values = {"text": input_text, "hasil": result, "date": current_time}
         
         # Menjalankan query
-        session.execute(query, values)
-        session.commit()
-        
-        # Menutup sesi
-        session.close()
+        with engine.connect() as connection:
+            connection.execute(query, values)
         
         return True
     except Exception as err:
