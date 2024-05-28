@@ -7,7 +7,6 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
-import mysql.connector
 from datetime import datetime
 
 # Lakukan unduhan NLTK di awal skrip
@@ -54,15 +53,8 @@ def classify_text(input_text):
 # Fungsi untuk menyimpan hasil analisis ke dalam database
 def save_to_database(input_text, result):
     try:
-        # Konfigurasi koneksi ke database
-        connection = mysql.connector.connect(
-            host='localhost',       # Ganti dengan host MySQL Anda
-            user='root',            # Ganti dengan username MySQL Anda
-            password='password',    # Ganti dengan password MySQL Anda
-            database='scentplus',   # Nama database
-            port=3306               # Pastikan port sudah benar
-        )
-        cursor = connection.cursor()
+        # Inisialisasi koneksi menggunakan st.connection
+        conn = st.connection('mysql', type='sql')
         
         # Mendapatkan waktu saat ini
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -72,17 +64,10 @@ def save_to_database(input_text, result):
         values = (input_text, result, current_time)
         
         # Menjalankan query
-        cursor.execute(query, values)
-        
-        # Commit perubahan
-        connection.commit()
-        
-        # Menutup koneksi
-        cursor.close()
-        connection.close()
+        conn.execute(query, values)
         
         return True
-    except mysql.connector.Error as err:
+    except Exception as err:
         st.error(f"Error: {err}")
         return False
 
