@@ -9,6 +9,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from datetime import datetime
 import sqlalchemy
+from sqlalchemy.orm import sessionmaker
 
 # Lakukan unduhan NLTK di awal skrip
 nltk.download('stopwords')
@@ -57,15 +58,24 @@ def save_to_database(input_text, result):
         # Inisialisasi koneksi menggunakan st.connection
         conn = st.connection('mysql', type='sql')
         
+        # Membuat sesi SQLAlchemy
+        engine = conn.get_engine()
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        
         # Mendapatkan waktu saat ini
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         # Membuat query untuk menyimpan data
-        query = "INSERT INTO riwayat (text, hasil, date) VALUES (%s, %s, %s)"
-        values = (input_text, result, current_time)
+        query = sqlalchemy.text("INSERT INTO riwayat (text, hasil, date) VALUES (:text, :hasil, :date)")
+        values = {"text": input_text, "hasil": result, "date": current_time}
         
         # Menjalankan query
-        conn.execute(query, values)
+        session.execute(query, values)
+        session.commit()
+        
+        # Menutup sesi
+        session.close()
         
         return True
     except Exception as err:
