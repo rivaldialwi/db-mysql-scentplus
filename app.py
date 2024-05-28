@@ -8,6 +8,7 @@ from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from datetime import datetime
+import sqlalchemy
 
 # Lakukan unduhan NLTK di awal skrip
 nltk.download('stopwords')

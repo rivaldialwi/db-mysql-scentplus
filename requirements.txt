@@ -6,4 +6,5 @@ joblib==1.2.0
 Sastrawi==1.0.1
 wordcloud==1.9.3
 mysql-connector-python==8.4.0
+SQLAlchemy==1.4.22
 streamlit
